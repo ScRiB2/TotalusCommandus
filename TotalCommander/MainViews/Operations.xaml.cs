@@ -46,38 +46,8 @@ namespace TotalCommander.MainViews
         public delegate void deletedEventHandler();
         public event deletedEventHandler ShowAfterDeleted;
 
-        public delegate void sortedNameElementsEventHandler(string side);
-        public event sortedNameElementsEventHandler ShowAfterNameSorted;
-
-        public delegate void sortedDateElementEventHandler(string side);
-        public event sortedDateElementEventHandler ShowAfterDateSorted;
-
         FocusCommunication communication = new FocusCommunication();
-        protected virtual void onShowAfterDateSorted()
-        {
-           
-            string side = communication.CorrectSide(sideLeft, sideRight);
-            sideLeft.isActive = false;
-            sideRight.isActive = false;
-
-            if (ShowAfterDateSorted != null)
-            {
-                ShowAfterDateSorted.Invoke(side);
-            }
-    }
-
-        protected virtual void onShowAfterNameSorted()
-        {
-            
-            string side = communication.CorrectSide(sideLeft, sideRight);
-            sideLeft.isActive = false;
-            sideRight.isActive = false;
-
-            if (ShowAfterNameSorted != null)
-            {
-                ShowAfterNameSorted.Invoke(side);
-            }
-         }
+       
 
         protected virtual void onShowAfterDeleted()
         {
@@ -209,18 +179,8 @@ namespace TotalCommander.MainViews
             }
         }
 
-        private void byName_Checked(object sender, RoutedEventArgs e)
-        {
-           onShowAfterNameSorted();
-        }
-        private void byName_Unchecked(object sender, RoutedEventArgs e)
-        {
-            onShowAfterDateSorted();
-        }
-
         private void button_Click(object sender, RoutedEventArgs e)
         {
-           
             string side = communication.CorrectSide(sideLeft, sideRight);
             sideLeft.isActive = false;
             sideRight.isActive = false;

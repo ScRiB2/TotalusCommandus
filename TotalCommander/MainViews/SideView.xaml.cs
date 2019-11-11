@@ -58,39 +58,86 @@ namespace TotalCommander.MainViews
                 }
         }
 
+        GridViewColumnHeader _lastHeaderClicked = null;
+        ListSortDirection _lastDirection = ListSortDirection.Ascending;
+
         void sortHandler(object sender, RoutedEventArgs e)
-        {
+        {   
             var headerClicked = e.OriginalSource as GridViewColumnHeader;
+            ListSortDirection direction;
             if (headerClicked != null)
             {
-                string columnName = headerClicked.Column.Header.ToString();
-                //switch (columnName)
-                //{
-                //    case "Название":
-                //        sortByName();
-                //        break;
-                //    case "Дата создания":
-                //        sortByDate();
-                //        break;
+                if (headerClicked.Role != GridViewColumnHeaderRole.Padding)
+                {
+                    if (headerClicked != _lastHeaderClicked)
+                    {
+                        direction = ListSortDirection.Ascending;
+                    }
+                    else
+                    {
+                        if (_lastDirection == ListSortDirection.Ascending)
+                        {
+                            direction = ListSortDirection.Descending;
+                        }
+                        else
+                        {
+                            direction = ListSortDirection.Ascending;
+                        }
+                    }
 
-                //}
+                    string columnName = headerClicked.Column.Header as string;
+                    switch (columnName)
+                    {
+                        case "Название":
+                            RefreshList();
+                            sortByName(direction);
+                            break;
+                        case "Дата создания":
+                            RefreshList();
+                            sortByDate(direction);
+                            break;
+                        case "Тип":
+                            RefreshList();
+                            sortByType(direction);
+                            break;
+                        case "Размер":
+                            RefreshList();
+                            sortBySize(direction);
+                            break;
+                    }
+                    _lastHeaderClicked = headerClicked;
+                    _lastDirection = direction;
+                }
             }
         }
 
 
-        public void sortByName()
+        public void sortByName(ListSortDirection direction = ListSortDirection.Ascending)
         {
            
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new SortDescription("Name", direction));
         }
 
 
-        public void sortByDate()
+        public void sortByDate(ListSortDirection direction = ListSortDirection.Ascending)
         {
           
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("CreationDate", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new SortDescription("CreationDate", direction));
+        }
+
+        public void sortByType(ListSortDirection direction = ListSortDirection.Ascending)
+        {
+
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
+            view.SortDescriptions.Add(new SortDescription("Type", direction));
+        }
+        public void sortBySize(ListSortDirection direction = ListSortDirection.Ascending)
+        {
+
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
+            view.SortDescriptions.Add(new SortDescription("IntSize", direction));
         }
         private void Side_loaded(object sender, RoutedEventArgs e)
         {

@@ -23,14 +23,10 @@ namespace TotalCommander.AdditionalElements
         public RichText(string txtFilePath, string name)
         {
             InitializeComponent();
-            
+
             string text = System.IO.File.ReadAllText(txtFilePath);
             richTextBox.AppendText(text);
             nameFileTxt.Content = name;
         }
-
-      
-
-      
     }
 }
