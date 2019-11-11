@@ -6,15 +6,9 @@
              xmlns:local="clr-namespace:TotalCommander"
              mc:Ignorable="d" Height="516.364" Width="453.636"
              Loaded="Side_loaded"
-             
              >
 
-    
-
-    <Grid Margin="0,0,-0.4,10">
-
-
-
+    <Grid>
         <ListView x:Name="listView" 
                   HorizontalAlignment="Left" 
                   Height="350" Margin="14,54,0,0" 

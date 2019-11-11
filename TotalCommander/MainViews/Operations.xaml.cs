@@ -34,7 +34,7 @@ namespace TotalCommander.MainViews
             InitializeComponent();
             this.sideLeft = sideLeft;
             this.sideRight = sideRight;
-           
+
         }
 
         public void RefreshAllList()
@@ -47,7 +47,7 @@ namespace TotalCommander.MainViews
         public event deletedEventHandler ShowAfterDeleted;
 
         FocusCommunication communication = new FocusCommunication();
-       
+
 
         protected virtual void onShowAfterDeleted()
         {
@@ -56,8 +56,8 @@ namespace TotalCommander.MainViews
                 ShowAfterDeleted.Invoke();
             }
         }
-        
-            private void delete_Click(object sender, RoutedEventArgs e)
+
+        private void delete_Click(object sender, RoutedEventArgs e)
         {
             if (sideRight.SelectedElement != null)
             {
@@ -65,7 +65,7 @@ namespace TotalCommander.MainViews
             }
             else selectedSite = SelectedSide.left;
 
-             if (selectedSite == SelectedSide.left)
+            if (selectedSite == SelectedSide.left)
             {
 
                 try
@@ -108,6 +108,23 @@ namespace TotalCommander.MainViews
                     MessageBox.Show(ex.Message);
                 }
             }
+        }
+
+        private void rename_Click(object sender, RoutedEventArgs e)
+        {
+            if (sideRight.SelectedElement != null)
+            {
+                selectedSite = SelectedSide.right;
+            }
+            else selectedSite = SelectedSide.left;
+            DiscElement presentElement = selectedSite == SelectedSide.left ? sideLeft.SelectedElement : sideRight.SelectedElement;
+            string path = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.Path : sideRight.SelectedElement.Path;
+            string sourcePath = selectedSite == SelectedSide.left ? sideLeft.mainPath.Text : sideRight.mainPath.Text;
+
+            string fileName = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.getName() : sideRight.SelectedElement.getName();
+            var dialog = new RenamePanel(path, sourcePath, presentElement.isFile(), fileName);
+            dialog.Show();
+            dialog.RenameObject += RefreshAllList;
         }
 
         private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
@@ -153,7 +170,6 @@ namespace TotalCommander.MainViews
                 selectedSite = SelectedSide.right;
             }
             else selectedSite = SelectedSide.left;
-
             DiscElement presentElement = selectedSite == SelectedSide.left ? sideLeft.SelectedElement : sideRight.SelectedElement;
             string dirName = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.Path : sideRight.SelectedElement.Path;
             string fileName = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.getName() : sideRight.SelectedElement.getName();
@@ -162,12 +178,16 @@ namespace TotalCommander.MainViews
             string sourceFile = System.IO.Path.Combine(sourcePath, fileName);
             string destFile = System.IO.Path.Combine(targetPath, fileName);
 
+            if (sourcePath == targetPath)
+                return;
+
             if (presentElement.isFile())
             {
-               if (!System.IO.Directory.Exists(targetPath))
+                if (!System.IO.Directory.Exists(targetPath))
                 {
                     System.IO.Directory.CreateDirectory(targetPath);
                 }
+
                 File.Copy(sourceFile, destFile, true);
                 onShowAfterDeleted();
             }
@@ -179,7 +199,8 @@ namespace TotalCommander.MainViews
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+
+        private void СreateDirectoryHandler(object sender, RoutedEventArgs e)
         {
             string side = communication.CorrectSide(sideLeft, sideRight);
             sideLeft.isActive = false;
@@ -188,8 +209,8 @@ namespace TotalCommander.MainViews
             var dialog = new CreateDirectory(sourcePath);
             dialog.Show();
             dialog.CreatedDirectory += RefreshAllList;
-           
-         }
+
+        }
 
         private void refresh_Click(object sender, RoutedEventArgs e)
         {

@@ -59,6 +59,9 @@
     <Compile Include="AdditionalElements\CreateDirectory.xaml.cs">
       <DependentUpon>CreateDirectory.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AdditionalElements\RenamePanel.xaml.cs">
+      <DependentUpon>RenamePanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AdditionalElements\RichText.xaml.cs">
       <DependentUpon>RichText.xaml</DependentUpon>
     </Compile>
@@ -75,6 +78,10 @@
       <DependentUpon>SideView.xaml</DependentUpon>
     </Compile>
     <Page Include="AdditionalElements\CreateDirectory.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdditionalElements\RenamePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -129,9 +136,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icon1.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\Folder.png" />
