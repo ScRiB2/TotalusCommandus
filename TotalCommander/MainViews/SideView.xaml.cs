@@ -88,19 +88,19 @@ namespace TotalCommander.MainViews
                     {
                         case "Название":
                             RefreshList();
-                            sortByName(direction);
+                            sortBy("Name", direction);
                             break;
                         case "Дата создания":
                             RefreshList();
-                            sortByDate(direction);
+                            sortBy("CreationDate", direction);
                             break;
                         case "Тип":
                             RefreshList();
-                            sortByType(direction);
+                            sortBy("Type", direction);
                             break;
                         case "Размер":
                             RefreshList();
-                            sortBySize(direction);
+                            sortBy("IntSize", direction);
                             break;
                     }
                     _lastHeaderClicked = headerClicked;
@@ -109,34 +109,12 @@ namespace TotalCommander.MainViews
             }
         }
 
-
-        public void sortByName(ListSortDirection direction = ListSortDirection.Ascending)
+        public void sortBy(string property, ListSortDirection direction)
         {
-
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("Name", direction));
+            view.SortDescriptions.Add(new SortDescription(property, direction));
         }
-
-
-        public void sortByDate(ListSortDirection direction = ListSortDirection.Ascending)
-        {
-
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("CreationDate", direction));
-        }
-
-        public void sortByType(ListSortDirection direction = ListSortDirection.Ascending)
-        {
-
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("Type", direction));
-        }
-        public void sortBySize(ListSortDirection direction = ListSortDirection.Ascending)
-        {
-
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("IntSize", direction));
-        }
+        
         private void Side_loaded(object sender, RoutedEventArgs e)
         {
             DriveInfo[] allDrives = DriveInfo.GetDrives();
@@ -189,9 +167,9 @@ namespace TotalCommander.MainViews
 
         private void Disc_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string[] nazwy;
-            nazwy = Directory.GetLogicalDrives();
-            mainPath.Text = nazwy[Disc.SelectedIndex];
+            string[] name;
+            name = Directory.GetLogicalDrives();
+            mainPath.Text = name[Disc.SelectedIndex];
             myStack.Clear();
             myStack.Push(mainPath.Text);
             RefreshList();

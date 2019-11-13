@@ -35,6 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -70,6 +71,7 @@
     <Compile Include="Classes\FocusCommunication.cs" />
     <Compile Include="Classes\MyDirectory.cs" />
     <Compile Include="Classes\MyFile.cs" />
+    <Compile Include="Classes\PathToMove.cs" />
     <Compile Include="Classes\SelectedSide.cs" />
     <Compile Include="MainViews\Operations.xaml.cs">
       <DependentUpon>Operations.xaml</DependentUpon>
