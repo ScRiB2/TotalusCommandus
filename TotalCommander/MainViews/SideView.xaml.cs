@@ -35,6 +35,17 @@ namespace TotalCommander.MainViews
 
         }
 
+        public void chageColor(SolidColorBrush fontColor, SolidColorBrush backgroundColor)
+        {
+            this.listView.Foreground = fontColor;
+            this.listView.Background = backgroundColor;
+        }
+
+        public void changeFont(int fontSize)
+        {
+            this.listView.FontSize = fontSize;
+        }
+
         public bool isActive { get; set; }
         private void Side_Loaded(object sender, RoutedEventArgs e)
         {
@@ -77,10 +88,9 @@ namespace TotalCommander.MainViews
             }
         }
 
-
         public void sortByName()
         {
-           
+
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
             view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
         }
@@ -88,7 +98,7 @@ namespace TotalCommander.MainViews
 
         public void sortByDate()
         {
-          
+
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
             view.SortDescriptions.Add(new SortDescription("CreationDate", ListSortDirection.Ascending));
         }

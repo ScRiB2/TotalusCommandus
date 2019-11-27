@@ -87,7 +87,7 @@ namespace TotalCommander.MainViews
             }
         }
         
-            private void delete_Click(object sender, RoutedEventArgs e)
+        private void delete_Click(object sender, RoutedEventArgs e)
         {
             if (sideRight.SelectedElement != null)
             {

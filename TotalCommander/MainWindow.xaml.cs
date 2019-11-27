@@ -29,9 +29,18 @@ namespace TotalCommander
         SideView sideRight;
         public Operations operation { get; set;}
 
+        private SolidColorBrush fontColor;
+        private SolidColorBrush backgroundColor;
+        private enum Colors
+        {
+            Default,
+            Red,
+            Black,
+            White
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-           
             sideLeft = new SideView();
             sideRight = new SideView();
             
@@ -48,8 +57,42 @@ namespace TotalCommander
        public MainWindow() :base()
         {
             InitializeComponent();
-         }
-       
+
+            var items = stylesMenu.Items;
+
+            var z = Enum.GetValues(typeof(Colors));
+            foreach (Colors color in z)
+            {
+                var newItem = new MenuItem();
+                newItem.Header = color;
+                newItem.Click += someColorFill_Click;
+                items.Add(newItem);
+            }
+        }
+
+        private void someColorFill_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menu = (MenuItem)sender;
+            switch (menu.Header)
+            {
+                case Colors.Red:
+                    fontColor = Brushes.White;
+                    backgroundColor = Brushes.Red;
+                    break;
+                case Colors.Black:
+                    fontColor = Brushes.White;
+                    backgroundColor = Brushes.Black;
+                    break;
+                case Colors.White:
+                    fontColor = Brushes.Black;
+                    backgroundColor = Brushes.White;
+                    break;
+                case Colors.Default:
+                    fontColor = Brushes.Blue;
+                    backgroundColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFE3F8FF");
+                    break;
+            }
+        }
 
         public void RefreshAllList()
         {
@@ -85,6 +128,40 @@ namespace TotalCommander
             }
         }
 
-       
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            bool fuck = false;
+            for (int i = 0; i < fontSizeBox.Text.Length; i++)
+            {
+                if (fontSizeBox.Text[i] < '0' || fontSizeBox.Text[i] > '9')
+                {
+                    fuck = true;
+                    break;
+                }
+            }
+
+            if (!fuck)
+            {
+                int size = int.Parse(fontSizeBox.Text);
+
+                if (size < 10 || size > 20)
+                {
+                    sideLeft.changeFont(15);
+                    sideRight.changeFont(15);
+                }
+
+                sideLeft.changeFont(size);
+                sideRight.changeFont(size);
+            }
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            if (fontColor != null && backgroundColor != null)
+            {
+                sideLeft.chageColor(fontColor, backgroundColor);
+                sideRight.chageColor(fontColor, backgroundColor);
+            }
+        }
     }
 }
