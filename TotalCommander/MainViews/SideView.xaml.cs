@@ -28,7 +28,7 @@ namespace TotalCommander.MainViews
     /// </summary>
     public partial class SideView : UserControl
     {
-        
+
         public SideView()
         {
             InitializeComponent();
@@ -50,13 +50,11 @@ namespace TotalCommander.MainViews
         private void Side_Loaded(object sender, RoutedEventArgs e)
         {
             isActive = false;
-
         }
 
         Stack myStack = new Stack();
         public DiscElement SelectedElement
         {
-
             get
             {
                 Contr selectedItem = ((Contr)listView.SelectedItem);
@@ -66,55 +64,81 @@ namespace TotalCommander.MainViews
                 }
                 else return null;
 
-                }
+            }
         }
+
+        GridViewColumnHeader _lastHeaderClicked = null;
+        ListSortDirection _lastDirection = ListSortDirection.Ascending;
 
         void sortHandler(object sender, RoutedEventArgs e)
         {
             var headerClicked = e.OriginalSource as GridViewColumnHeader;
+            ListSortDirection direction;
             if (headerClicked != null)
             {
-                string columnName = headerClicked.Column.Header.ToString();
-                //switch (columnName)
-                //{
-                //    case "Название":
-                //        sortByName();
-                //        break;
-                //    case "Дата создания":
-                //        sortByDate();
-                //        break;
+                if (headerClicked.Role != GridViewColumnHeaderRole.Padding)
+                {
+                    if (headerClicked != _lastHeaderClicked)
+                    {
+                        direction = ListSortDirection.Ascending;
+                    }
+                    else
+                    {
+                        if (_lastDirection == ListSortDirection.Ascending)
+                        {
+                            direction = ListSortDirection.Descending;
+                        }
+                        else
+                        {
+                            direction = ListSortDirection.Ascending;
+                        }
+                    }
 
-                //}
+                    string columnName = headerClicked.Column.Header as string;
+                    switch (columnName)
+                    {
+                        case "Название":
+                            RefreshList();
+                            sortBy("Name", direction);
+                            break;
+                        case "Дата создания":
+                            RefreshList();
+                            sortBy("CreationDate", direction);
+                            break;
+                        case "Тип":
+                            RefreshList();
+                            sortBy("Type", direction);
+                            break;
+                        case "Размер":
+                            RefreshList();
+                            sortBy("IntSize", direction);
+                            break;
+                    }
+                    _lastHeaderClicked = headerClicked;
+                    _lastDirection = direction;
+                }
             }
         }
 
-        public void sortByName()
+        public void sortBy(string property, ListSortDirection direction)
         {
-
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new SortDescription(property, direction));
         }
-
-
-        public void sortByDate()
-        {
-
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listView.ItemsSource);
-            view.SortDescriptions.Add(new SortDescription("CreationDate", ListSortDirection.Ascending));
-        }
+        
         private void Side_loaded(object sender, RoutedEventArgs e)
         {
             DriveInfo[] allDrives = DriveInfo.GetDrives();
             foreach (var dysk in allDrives)
             {
                 if (dysk.IsReady)
-                 Disc.Items.Add(dysk.Name);
+                    Disc.Items.Add(dysk.Name);
             }
             Disc.SelectedIndex = 0;
             mainPath.Text = allDrives[0].Name;
             myStack.Push(mainPath.Text);
         }
-        
+
         public bool RefreshList()
         {
             listView.ItemsSource = "";
@@ -125,13 +149,14 @@ namespace TotalCommander.MainViews
             try
             {
                 elements = dirs.GetSubElements();
-            } catch
+            }
+            catch
             {
                 MessageBox.Show("Нет доступа");
                 elements = dirs.GetSubElements();
                 isThrow = true;
             }
-            
+
             foreach (var item in elements)
             {
                 controller.Add(new Contr(item));
@@ -153,14 +178,14 @@ namespace TotalCommander.MainViews
 
         private void Disc_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string[] nazwy;
-            nazwy = Directory.GetLogicalDrives();
-            mainPath.Text = nazwy[Disc.SelectedIndex];
+            string[] name;
+            name = Directory.GetLogicalDrives();
+            mainPath.Text = name[Disc.SelectedIndex];
             myStack.Clear();
             myStack.Push(mainPath.Text);
             RefreshList();
             isActive = true;
-           
+
         }
 
         private void OpenDirectory(object sender, MouseButtonEventArgs e)
@@ -188,9 +213,10 @@ namespace TotalCommander.MainViews
                     {
                         string oldText = mainPath.Text;
                         mainPath.Text = selectedItem.Path;
-                        
+
                         bool isThrow = RefreshList();
-                        if (isThrow) {
+                        if (isThrow)
+                        {
                             mainPath.Text = oldText;
                             return;
                         }
@@ -212,15 +238,15 @@ namespace TotalCommander.MainViews
 
         }
 
-         private void listView_GotFocus(object sender, RoutedEventArgs e)
+        private void listView_GotFocus(object sender, RoutedEventArgs e)
         {
-          isActive = true;
+            isActive = true;
         }
 
         private void txtFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(listView.ItemsSource).Refresh();
-       }
+        }
 
-          }
+    }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +15,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TotalCommander.Classes;
 using TotalCommander.AdditionalElements;
+using Microsoft.VisualBasic.FileIO;
+using System.ComponentModel;
 
 namespace TotalCommander.MainViews
 {
@@ -28,13 +30,12 @@ namespace TotalCommander.MainViews
         public SideView sideLeft { get; set; }
         public SideView sideRight { get; set; }
 
-
         public Operations(SideView sideLeft, SideView sideRight)
         {
             InitializeComponent();
             this.sideLeft = sideLeft;
             this.sideRight = sideRight;
-           
+
         }
 
         public void RefreshAllList()
@@ -46,38 +47,8 @@ namespace TotalCommander.MainViews
         public delegate void deletedEventHandler();
         public event deletedEventHandler ShowAfterDeleted;
 
-        public delegate void sortedNameElementsEventHandler(string side);
-        public event sortedNameElementsEventHandler ShowAfterNameSorted;
-
-        public delegate void sortedDateElementEventHandler(string side);
-        public event sortedDateElementEventHandler ShowAfterDateSorted;
-
         FocusCommunication communication = new FocusCommunication();
-        protected virtual void onShowAfterDateSorted()
-        {
-           
-            string side = communication.CorrectSide(sideLeft, sideRight);
-            sideLeft.isActive = false;
-            sideRight.isActive = false;
 
-            if (ShowAfterDateSorted != null)
-            {
-                ShowAfterDateSorted.Invoke(side);
-            }
-    }
-
-        protected virtual void onShowAfterNameSorted()
-        {
-            
-            string side = communication.CorrectSide(sideLeft, sideRight);
-            sideLeft.isActive = false;
-            sideRight.isActive = false;
-
-            if (ShowAfterNameSorted != null)
-            {
-                ShowAfterNameSorted.Invoke(side);
-            }
-         }
 
         protected virtual void onShowAfterDeleted()
         {
@@ -86,7 +57,63 @@ namespace TotalCommander.MainViews
                 ShowAfterDeleted.Invoke();
             }
         }
-        
+
+        private void asyncCopy(object sender, DoWorkEventArgs e)
+        {
+            var path = (PathToMove)e.Argument;
+            if (path.isFile)
+                try
+                {
+                    FileSystem.CopyFile(path.From, path.To, UIOption.AllDialogs);
+                }
+                catch { }
+            else
+                try
+                {
+                    FileSystem.CopyDirectory(path.From, path.To, UIOption.AllDialogs);
+                }
+                catch { }
+        }
+
+        private void asyncMove(object sender, DoWorkEventArgs e)
+        {
+            var path = (PathToMove)e.Argument;
+            if (path.isFile)
+                try
+                {
+                    FileSystem.MoveFile(path.From, path.To, UIOption.AllDialogs);
+                }
+                catch { }
+            else
+                try
+                {
+                    FileSystem.MoveDirectory(path.From, path.To, UIOption.AllDialogs);
+                }
+                catch { }
+        }
+
+        private void asyncDelete(object sender, DoWorkEventArgs e)
+        {
+            var path = (PathToMove)e.Argument;
+            if (path.isFile)
+                try
+                {
+                    FileSystem.DeleteFile(path.From);
+                }
+                catch { }
+            else
+                try
+                {
+                    FileSystem.DeleteDirectory(path.From, DeleteDirectoryOption.DeleteAllContents);
+                }
+                catch { }
+        }
+
+        private void afterAsyncDelete(object sender, RunWorkerCompletedEventArgs e)
+        {
+            ShowAfterDeleted();
+        }
+
         private void delete_Click(object sender, RoutedEventArgs e)
         {
             if (sideRight.SelectedElement != null)
@@ -95,22 +122,16 @@ namespace TotalCommander.MainViews
             }
             else selectedSite = SelectedSide.left;
 
-             if (selectedSite == SelectedSide.left)
+            if (selectedSite == SelectedSide.left)
             {
 
                 try
                 {
-                    if (sideLeft.SelectedElement.isFile())
-                    {
-                        File.Delete(sideLeft.SelectedElement.Path);
-                        ShowAfterDeleted();
-                    }
-                    else
-                    {
-                        Directory.Delete(sideLeft.SelectedElement.Path, true);
-                        ShowAfterDeleted();
-                    }
-
+                    var paths = new PathToMove(sideLeft.SelectedElement.Path, "", sideLeft.SelectedElement.isFile());
+                    var bW = new BackgroundWorker();
+                    bW.DoWork += asyncDelete;
+                    bW.RunWorkerCompleted += afterAsyncDelete;
+                    bW.RunWorkerAsync(paths);
                 }
                 catch (Exception ex)
                 {
@@ -122,16 +143,11 @@ namespace TotalCommander.MainViews
             {
                 try
                 {
-                    if (sideRight.SelectedElement.isFile())
-                    {
-                        File.Delete(sideRight.SelectedElement.Path);
-                        ShowAfterDeleted();
-                    }
-                    else
-                    {
-                        Directory.Delete(sideRight.SelectedElement.Path, true);
-                        ShowAfterDeleted();
-                    }
+                    var paths = new PathToMove(sideRight.SelectedElement.Path, "", sideRight.SelectedElement.isFile());
+                    var bW = new BackgroundWorker();
+                    bW.DoWork += asyncDelete;
+                    bW.RunWorkerCompleted += afterAsyncDelete;
+                    bW.RunWorkerAsync(paths);
                 }
                 catch (Exception ex)
                 {
@@ -140,40 +156,28 @@ namespace TotalCommander.MainViews
             }
         }
 
-        private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        private void rename_Click(object sender, RoutedEventArgs e)
         {
-            // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-
-            DirectoryInfo[] dirs = dir.GetDirectories();
-            // If the destination directory doesn't exist, create it.
-            if (!Directory.Exists(destDirName))
+            if (sideRight.SelectedElement != null)
             {
-                Directory.CreateDirectory(destDirName);
+                selectedSite = SelectedSide.right;
             }
+            else selectedSite = SelectedSide.left;
+            DiscElement presentElement = selectedSite == SelectedSide.left ? sideLeft.SelectedElement : sideRight.SelectedElement;
+            string path = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.Path : sideRight.SelectedElement.Path;
+            string sourcePath = selectedSite == SelectedSide.left ? sideLeft.mainPath.Text : sideRight.mainPath.Text;
 
-            else
-            {
-                MessageBox.Show("Folder o podanej nazwie już istnieje");
-            }
+            string fileName = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.getName() : sideRight.SelectedElement.getName();
+            var dialog = new RenamePanel(path, sourcePath, presentElement.isFile(), fileName);
+            dialog.Show();
+            dialog.RenameObject += RefreshAllList;
+        }
 
-            // Get the files in the directory and copy them to the new location.
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
-            {
-                string temppath = System.IO.Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, false);
-            }
 
-            // If copying subdirectories, copy them and their contents to new location.
-            if (copySubDirs)
-            {
-                foreach (DirectoryInfo subdir in dirs)
-                {
-                    string temppath = System.IO.Path.Combine(destDirName, subdir.Name);
-                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
-                }
-            }
+
+        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            onShowAfterDeleted();
         }
 
         private void copy_Click(object sender, RoutedEventArgs e)
@@ -192,35 +196,86 @@ namespace TotalCommander.MainViews
             string sourceFile = System.IO.Path.Combine(sourcePath, fileName);
             string destFile = System.IO.Path.Combine(targetPath, fileName);
 
+            if (sourcePath == targetPath)
+                return;
+
             if (presentElement.isFile())
             {
-               if (!System.IO.Directory.Exists(targetPath))
+                if (!Directory.Exists(targetPath))
                 {
-                    System.IO.Directory.CreateDirectory(targetPath);
+                    Directory.CreateDirectory(targetPath);
                 }
-                File.Copy(sourceFile, destFile, true);
-                onShowAfterDeleted();
+                var paths = new PathToMove(sourceFile, destFile, presentElement.isFile());
+                var bW = new BackgroundWorker();
+                bW.DoWork += asyncCopy;
+                bW.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
+                bW.RunWorkerAsync(paths);
             }
 
             else
             {
-                DirectoryCopy(dirName, destFile, true);
-                onShowAfterDeleted();
+                var paths = new PathToMove(dirName, destFile, presentElement.isFile());
+                var bW = new BackgroundWorker();
+                bW.DoWork += asyncCopy;
+                bW.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
+                bW.RunWorkerAsync(paths);
             }
         }
 
-        private void byName_Checked(object sender, RoutedEventArgs e)
+        private void Move_Click(object sender, RoutedEventArgs e)
         {
-           onShowAfterNameSorted();
-        }
-        private void byName_Unchecked(object sender, RoutedEventArgs e)
-        {
-            onShowAfterDateSorted();
+            if (sideRight.SelectedElement != null)
+            {
+                selectedSite = SelectedSide.right;
+            }
+            else selectedSite = SelectedSide.left;
+
+            DiscElement presentElement = selectedSite == SelectedSide.left ? sideLeft.SelectedElement : sideRight.SelectedElement;
+            string dirName = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.Path : sideRight.SelectedElement.Path;
+            string fileName = selectedSite == SelectedSide.left ? sideLeft.SelectedElement.getName() : sideRight.SelectedElement.getName();
+            string sourcePath = selectedSite == SelectedSide.left ? sideLeft.mainPath.Text : sideRight.mainPath.Text;
+            string targetPath = selectedSite == SelectedSide.left ? sideRight.mainPath.Text : sideLeft.mainPath.Text;
+            string sourceFile = System.IO.Path.Combine(sourcePath, fileName);
+            string destFile = System.IO.Path.Combine(targetPath, fileName);
+
+            if (sourcePath == targetPath)
+                return;
+
+            if (presentElement.isFile())
+            {
+                if (!Directory.Exists(targetPath))
+                {
+                    Directory.CreateDirectory(targetPath);
+                }
+
+                var paths = new PathToMove(sourceFile, destFile, presentElement.isFile());
+                var bW = new BackgroundWorker();
+                bW.DoWork += asyncMove;
+                bW.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
+                bW.RunWorkerAsync(paths);
+            }
+
+            else
+            {
+                if (!Directory.Exists(destFile))
+                {
+                    var paths = new PathToMove(dirName, destFile, presentElement.isFile());
+                    var bW = new BackgroundWorker();
+                    bW.DoWork += asyncMove;
+                    bW.RunWorkerCompleted += backgroundWorker_RunWorkerCompleted;
+                    bW.RunWorkerAsync(paths);
+                }
+                else
+                {
+                    MessageBox.Show("Папка с указанным именем уже существует");
+                    return;
+                }
+            }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+
+        private void СreateDirectoryHandler(object sender, RoutedEventArgs e)
         {
-           
             string side = communication.CorrectSide(sideLeft, sideRight);
             sideLeft.isActive = false;
             sideRight.isActive = false;
@@ -228,13 +283,13 @@ namespace TotalCommander.MainViews
             var dialog = new CreateDirectory(sourcePath);
             dialog.Show();
             dialog.CreatedDirectory += RefreshAllList;
-           
-         }
+        }
 
         private void refresh_Click(object sender, RoutedEventArgs e)
         {
             RefreshAllList();
         }
+
 
     }
 }

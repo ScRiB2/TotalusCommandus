@@ -46,8 +46,6 @@ namespace TotalCommander
             
             operation = new Operations(sideLeft, sideRight);
             operation.ShowAfterDeleted += RefreshAllList;
-            operation.ShowAfterNameSorted += RefreshAfterNameSort;
-            operation.ShowAfterDateSorted += RefreshAfterDateSort;
            
             leftBorder.Child = sideLeft;
             rightBorder.Child = sideRight;
@@ -98,34 +96,6 @@ namespace TotalCommander
         {
             this.sideLeft.RefreshList();
             this.sideRight.RefreshList();
-        }
-
-         public void RefreshAfterNameSort(string a)
-        {
-            if (a == "left")
-            {
-                this.sideLeft.RefreshList();
-                sideLeft.sortByName();
-
-            }
-            else {
-                this.sideRight.RefreshList();
-                sideRight.sortByName(); }
-        }
-        public void RefreshAfterDateSort(string a)
-        {
-         
-            if (a == "left")
-            {
-                this.sideLeft.RefreshList();
-                sideLeft.sortByDate();
-
-            }
-            else
-            {
-                this.sideRight.RefreshList();
-                sideRight.sortByDate();
-            }
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
