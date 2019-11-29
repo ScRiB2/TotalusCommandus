@@ -35,6 +35,17 @@ namespace TotalCommander.MainViews
 
         }
 
+        public void chageColor(SolidColorBrush fontColor, SolidColorBrush backgroundColor)
+        {
+            this.listView.Foreground = fontColor;
+            this.listView.Background = backgroundColor;
+        }
+
+        public void changeFont(int fontSize)
+        {
+            this.listView.FontSize = fontSize;
+        }
+
         public bool isActive { get; set; }
         private void Side_Loaded(object sender, RoutedEventArgs e)
         {
