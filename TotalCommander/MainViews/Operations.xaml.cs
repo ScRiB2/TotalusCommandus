@@ -35,7 +35,8 @@ namespace TotalCommander.MainViews
             InitializeComponent();
             this.sideLeft = sideLeft;
             this.sideRight = sideRight;
-
+            this.sideLeft.RefreshAllList += RefreshAllList;
+            this.sideRight.RefreshAllList += RefreshAllList;
         }
 
         public void RefreshAllList()

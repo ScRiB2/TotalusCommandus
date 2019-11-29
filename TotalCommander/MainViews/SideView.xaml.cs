@@ -28,6 +28,16 @@ namespace TotalCommander.MainViews
     /// </summary>
     public partial class SideView : UserControl
     {
+        public delegate void RefreshAllListEventHandler();
+        public event RefreshAllListEventHandler RefreshAllList;
+
+        protected virtual void onRefreshAllList()
+        {
+            if (RefreshAllList != null)
+            {
+                RefreshAllList.Invoke();
+            }
+        }
 
         public SideView()
         {
@@ -203,6 +213,7 @@ namespace TotalCommander.MainViews
                         if (selectedItem.Type == "TXT")
                         {
                             RichText textWindow = new RichText(selectedItem.Path, selectedItem.Name);
+                            textWindow.SaveTextFile += onRefreshAllList;
                             textWindow.Show();
                         }
                         else

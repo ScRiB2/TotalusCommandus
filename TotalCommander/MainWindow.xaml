@@ -15,11 +15,11 @@
         <Button x:Name="spplyFontSize" Content="Применить шрифт" HorizontalAlignment="Left" Height="21" Margin="129,10,0,0" VerticalAlignment="Top" Width="125" Click="applyFontSize_Click"/>
         <TextBox x:Name="fontSizeBox" HorizontalAlignment="Left" Height="20" Margin="18,11,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="95" Text="12"/>
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="17" Margin="299,10,0,0" VerticalAlignment="Top" Width="50">
-            <MenuItem x:Name="stylesMenu" Header="Стиль" Width="50"/>
+            <MenuItem x:Name="stylesMenu" Header="Стиль" Width="50" Height="26"/>
         </Menu>
         <Button x:Name="applyStyle" Content="Применить стиль" HorizontalAlignment="Left" Margin="376,11,0,0" VerticalAlignment="Top" Width="119" Click="applyStyle_Click"/>
-        <Button x:Name="save" Content="Save" HorizontalAlignment="Left" Height="18" Margin="515,13,0,0" VerticalAlignment="Top" Width="77" Click="save_Click"/>
-        <Button x:Name="load" Content="Load" HorizontalAlignment="Left" Height="18" Margin="613,13,0,0" VerticalAlignment="Top" Width="92" Click="load_Click"/>
+        <Button x:Name="save" Content="Save" HorizontalAlignment="Left" Height="24" Margin="515,13,0,0" VerticalAlignment="Top" Width="77" Click="save_Click"/>
+        <Button x:Name="load" Content="Load" HorizontalAlignment="Left" Height="24" Margin="613,13,0,0" VerticalAlignment="Top" Width="92" Click="load_Click"/>
     </Grid>
 
 </Window>
