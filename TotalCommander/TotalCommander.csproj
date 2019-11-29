@@ -74,6 +74,7 @@
     <Compile Include="Classes\MyFile.cs" />
     <Compile Include="Classes\PathToMove.cs" />
     <Compile Include="Classes\SelectedSide.cs" />
+    <Compile Include="Classes\MyStyle.cs" />
     <Compile Include="MainViews\Operations.xaml.cs">
       <DependentUpon>Operations.xaml</DependentUpon>
     </Compile>
